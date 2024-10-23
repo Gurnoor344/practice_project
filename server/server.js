@@ -20,7 +20,7 @@ dotenv.config();
 const app=express();
 const port =process.env.port || 5000; 
 
-
+app.set('view engine','hbs');
 app.use(express.json());  
 app.use(cors());
 // //error handling middleware 
@@ -31,6 +31,24 @@ app.get('/',(req,res)=>{
     res.send("working");
 });
 
+app.get('/home',(req,res)=>{
+   // let user = User.findOne({id:})
+    res.render("home",{
+        username :"gurnoor"
+    })
+});
+
+app.get('/alluser',(req,res)=>{
+    // let user = User.findOne({id:})
+     const user = [
+         {Username :"gurnoor",Age : 16},
+         {Username :"sdfghjk",Age : 45}
+     ];
+     res.render("alluser",{
+        user:user
+     });
+ });
+ 
 app.use(errorHandler)
 
 
