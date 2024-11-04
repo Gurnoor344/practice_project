@@ -11,6 +11,8 @@ const express = require('express')
 const connectDb=require("./config/dbConnection")
 const errorHandler=require('./middleware/errorHandler')
 const cors=require("cors"); 
+var hbs = require('hbs');
+hbs.registerPartials(__dirname+'./views/partials',function (err) {});
 
 //env file config [how it will work]
 const dotenv = require("dotenv");
@@ -23,6 +25,11 @@ const port =process.env.port || 5000;
 app.set('view engine','hbs');
 app.use(express.json());  
 app.use(cors());
+
+
+//user registration 
+app.use("/api/register", require("./routes/userRoutes"));
+
 // //error handling middleware 
 
 
@@ -48,6 +55,8 @@ app.get('/alluser',(req,res)=>{
         user:user
      });
  });
+
+
  
 app.use(errorHandler)
 
