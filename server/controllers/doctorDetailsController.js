@@ -37,3 +37,4 @@ const getDoctors = asyncHandler(async (req, res) => {
     res.status(200).json(doctors);
 });
 module.exports={docDetails,getDoctors}
+

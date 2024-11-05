@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");   // parallel cheeeza chal skn 
 const bcrypt = require("bcrypt"); // for password encryption 
 const User = require("../model/userModel");
+const jwt = require("jsonwebtoken")
 require("dotenv").config();
 
 //@route post/api/user/register
@@ -58,9 +59,14 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     // Static token generation (for example purpose)
-    const token = "static_token_for_user"; // Replace with actual logic for generating token
+    // const token = "static_token_for_user"; // Replace with actual logic for generating token
 
-    res.json({ message: "Login successful", token });
+    // res.json({ message: "Login successful", token });
+
+    // Generate JWT token (optional for authentication)
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+
+    res.status(200).json({ message: "Login successful", token, user: { email: user.email, first_name: user.first_name } });
 });
 
 module.exports={registerUser,loginUser};
