@@ -45,28 +45,37 @@ const registerUser = asyncHandler(async (req,res)=>{
 // Login user with static token
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-
-    // Check for user
+    if (!email || !password) {
+        res.status(400);
+        throw new Error("Please provide email and password");
+    }
+    
     const user = await User.findOne({ email });
-    if (!user) {
-        return res.status(400).json({ message: "Invalid credentials" });
+    
+    if (user && (await bcrypt.compare(password, user.password))) {
+        // Generate JWT token
+        const token = jwt.sign(
+            { id: user._id, email: user.email },
+            process.env.PRIVATE_KEY,
+            { expiresIn: "1h" }  // Token expiration time
+        );
+
+        console.log(token)
+
+        res.status(200).json({
+            message: "Login successful",
+            token,
+            user: {
+                id: user._id,
+                firstname: user.firstname,
+                lastname: user.lastname,
+                email: user.email,
+            },
+        });
+    } else {
+        res.status(401);
+        throw new Error("Invalid email or password");
     }
-
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-        return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    // Static token generation (for example purpose)
-    // const token = "static_token_for_user"; // Replace with actual logic for generating token
-
-    // res.json({ message: "Login successful", token });
-
-    // Generate JWT token (optional for authentication)
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
-
-    res.status(200).json({ message: "Login successful", token, user: { email: user.email, first_name: user.first_name } });
 });
 
-module.exports={registerUser,loginUser};
+module.exports = { registerUser, loginUser };

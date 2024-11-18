@@ -1,3 +1,5 @@
+const jwt = require("jsonwebtoken");
+const asyncHandler = require("express-async-handler");
 const {constants}=require ("../constants");//coz of multiple key-value pairs(we have to pick one of them),so it is in form of object
 const errorHandler=(err,req,res,next)=>{
     const statusCode=res.statusCode?statusCode:500;
@@ -40,4 +42,25 @@ const errorHandler=(err,req,res,next)=>{
 
     }
 }
-module.exports=errorHandler;
+
+const protect = asyncHandler(async (req, res, next) => {
+    let token;
+
+    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+        try {
+            token = req.headers.authorization.split(" ")[1];
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            req.user = decoded.id;
+            next();
+        } catch (error) {
+            res.status(401);
+            throw new Error("Not authorized, token failed");
+        }
+    } else {
+        res.status(401);
+        throw new Error("No token, authorization denied");
+    }
+});
+
+
+module.exports = {errorHandler , protect};

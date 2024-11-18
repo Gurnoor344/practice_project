@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const bcrypt = require("bcrypt");
+
 const doctor= require("../model/doctorDetailsModel")
 require("dotenv").config();
 
